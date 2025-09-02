@@ -31,95 +31,93 @@
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+        <!-- Bootstrap CSS -->
+        <link 
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
+        rel="stylesheet" 
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
+        crossorigin="anonymous">
+
         <!--  AOS (ANIMATIONS)  -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
 
         <!--  APP CSS  -->
-        <link rel="stylesheet" href="style.css" />
-
-        <!--  STRUCTURED DATA  -->
-        <script type="application/ld+json">
-        {
-            "@context":"https://schema.org",
-            "@type":"SoftwareApplication",
-            "name":"AI Study Buddy",
-            "applicationCategory":"EducationalApplication",
-            "operatingSystem":"Web",
-            "description":"AI-powered flashcard generator that converts study notes into interactive cards.",
-            "author":{"@type":"Person","name":"Gideon Udeh"},
-            "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
-        }
-        </script>
-        <noscript>
-            <style>
-            .requires-js { display: none !important; }
-            .noscript-note { background:#fff3cd;color:#664d03;padding:1rem;margin:0;text-align:center }
-            </style>
-        </noscript>
+        <link rel="stylesheet" href="styles.css" />
     </head>
 
     <!-- Body section -->
      <body>
-        <div class="noscript-note">
-            This app uses JavaScript for AI generation and Interactive Flashcards. Please enable JavaScript.
-        </div>
-
-        <!-- Skip Link for Ally -->
-         <a href="#main" class="skip-link">Skip to main content</a>
-
         <!-- Header / Nav section -->
-         <header class="site-header" role="banner">
-            <div class="container header-container">
-                <a href="#hero" class="brand" aria-label="AI Study Buddy Home">
-                    <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
-                    <span class="brand-text">AI Study Buddy</span>
-                </a>
+         <header class="site-header shadow-sm sticky-top bg-white" role="banner">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white">
+                <div class="container">
 
-                <nav class="site-nav" aria-label="Primary">
-                    <ul class="nav-list" id="nav-list">
-                        <li><a href="#hero" class="nav-link">Home</a></li>
-                        <li><a href="#features" class="nav-link">Features</a></li>
-                        <li><a href="#generator" class="nav-link">Generate</a></li>
-                        <li><a href="#library" class="nav-link">Library</a></li>
-                        <li><a href="#contact" class="nav-link">Contact</a></li>
-                    </ul>
+                    <!-- Brand -->
+                     <a href="#hero" class="navbar-brand d-flex align-items-center" aria-label="AI Study Buddy Home">
+                        <i class="fa-solid fa-graduation-cap me-2 text-primary"></i>
+                        <span class="brand-text">🤖AI Study Buddy</span>
+                     </a>
 
-                    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navList">
-                        <span></span><span></span><span></span>
+                     <!-- Navbar toggler -->
+                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
                     </button>
-                </nav>
+
+                    <!-- Navbar links -->
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a href="#hero" class="nav-link">Home</a></li>
+                        <li class="nav-item"><a href="#features" class="nav-link">Features</a></li>
+                        <li class="nav-item"><a href="#generator" class="nav-link">Generate</a></li>
+                        <li class="nav-item"><a href="#library" class="nav-link">Library</a></li>
+                        <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
+                        </ul>
+                    </div>
+
+                    </div>
+                </div>
+              </nav>
             </div>
          </header>
 
         <!-- Main Section  -->
          <main id="main">
             <!-- Hero section -->
-             <section class="hero-section" id="hero" data-aos="fade-up" aria-labelledby="heroTitle">
-                <div class="container hero-grid">
-                    <div class="hero-copy">
-                        <h1 id="heroTitle">Turn Notes into Flashcards with AI</h1>
-                        <p class="hero-sub">
+             <section class="hero-section text-center text-lg-start" id="hero" data-aos="fade-left" aria-labelledby="heroTitle">
+                <div class="container py-5">
+                    <div class="row align-items-center g-5">
+                        <!-- Hero copy -->
+                    <div class="col-lg-6">
+                        <h1 id="heroTitle" class="fw-bold display-5">Turn Notes into Flashcards with AI</h1>
+                        <p class="hero-sub lead">
                             Paste your study notes and let AI create interactive Flashcards for active recall and spaced repition.
                         </p>
-                        <div class="hero-cta">
+
+                        <!-- CTA buttons -->
+                        <div class="d-flex flex-wrap gap-3 mb-3">
                             <a href="#generator" class="btn btn-primary">
                                 <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Generate Cards
                             </a>
-                            <a href="#library" class="btn btn-ghost">
+                            <a href="#library" class="btn btn-outline-light">
                                 <i class="fa-solid fa-book" aria-hidden="true"></i> View Library
                             </a>
                         </div>
-                        <ul class="hero-highlights">
+
+                        <!-- Highlights -->
+                        <ul class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start list-unstyled hero-highlights">
                             <li><i class="fa-solid fa-robot"></i> Hugging Face QA</li>
                             <li><i class="fa-solid fa-database"></i> Save to MySQL</li>
                             <li><i class="fa-solid fa-bolt"></i> Lightweight & Fast</li>
                         </ul>
                     </div>
-                    <div class="hero-visual requires-js" aria-hidden="true">
+
+                    <!-- Hero visual -->
+                    <div class="col-lg-6 d-flex text-center justify-content-center justify-content-lg-end" aria-hidden="true">
                         <div class="card-demo">
                             <div class="flashcard">
-                                <div class="flashcard-face front">What is Active Recall?</div>
-                                <div class="flashcard-face back">A study technique that boosts retention by retrieving information from memory.</div>
+                                <div class="flashcard-face front"><span>What is Active Recall?</span></div>
+                                <div class="flashcard-face back"><span>A study technique that boosts retention by retrieving information from memory.</span></div>
                             </div>
                         </div>
                     </div>
@@ -127,116 +125,132 @@
              </section>
 
             <!-- Features section -->
-             <section class="features-section" id="features" aria-labelledby="featuresTitle">
+             <section class="features-section py-5" id="features" aria-labelledby="featuresTitle">
                 <div class="container">
-                    <h2 class="section-title" id="featuresTitle"> Why AI Study Buddy?</h2>
-                    <div class="features-grid">
-                        <article class="feature-card" data-aos="fade-up">
-                            <i class="fa-solid fa-wand-magic-sparkles feature-icon"></i>
-                            <h3>Auto Question Generation</h3>
-                            <p>AI transforms your notes into five quiz questions in seconds.</p>
-                        </article>
+                    <h2 class="section-title text-center mb-5" id="featuresTitle"> Why AI Study Buddy?</h2>
+                    <div class="row g-4">
+                        
+                        <div class="col-md-6 col-lg-4">
+                            <article class="feature-card h-100 text-center p-4" data-aos="fade-up">
+                                <i class="fa-solid fa-wand-magic-sparkles feature-icon"></i>
+                                <h3 class="mt-3">Auto Question Generation</h3>
+                                <p>AI transforms your notes into five quiz questions in seconds.</p>
+                            </article>
+                        </div>
 
-                        <article class="feature-card" data-aos="fade-up" data-aos-delay="200">
-                            <i class="fa-solid fa-database feature-icon"></i>
-                            <h3>Persistent Library</h3>
-                            <p>Save, search, and reuse your flashcards anytime.</p>
-                        </article>
+                        <div class="col-md-6 col-lg-4">
+                            <article class="feature-card h-100 text-center p-4" data-aos="fade-up" data-aos-delay="200">
+                                <i class="fa-solid fa-database feature-icon"></i>
+                                <h3>Persistent Library</h3>
+                                <p>Save, search, and reuse your flashcards anytime.</p>
+                            </article>
+                        </div>
 
-                        <article class="feature-card" data-aos="fade-up" data-aos-delay="300">
-                            <i class="fa-solid fa-shield-heart feature-icon"></i>
-                            <h3>Privacy First</h3>
-                            <p>Your notes are processed securely; export or delete with a click.</p>
-                        </article>
+                        <div class="col-md-6 col-lg-4">
+                            <article class="feature-card h-100 text-center p-4" data-aos="fade-up" data-aos-delay="300">
+                                <i class="fa-solid fa-shield-heart feature-icon"></i>
+                                <h3>Privacy First</h3>
+                                <p>Your notes are processed securely; export or delete with a click.</p>
+                            </article>
+                        </div>
                     </div>
                 </div>
              </section>
 
             <!-- Generator Section -->
-             <section class="generator-section" id="generator" aria-labelledby="generatorTitle">
+             <section class="generator-section py-5" id="generator" aria-labelledby="generatorTitle">
                 <div class="container">
-                    <h2 class="section-title" id="generatorTitle">Generate Flashcards</h2>
-                    <p class="section-subtitle">Paste your notes below and click "Generate". We'll send them to AI and return flashcards you can flip, edit, and save.</p>
+                    <h2 class="section-title text-center mb-3" id="generatorTitle">Generate Flashcards</h2>
+                    <p class="section-subtitle text-center mb-5">Paste your notes below and click "Generate". We'll send them to AI and return flashcards you can flip, edit, and save.</p>
 
-                    <form id="noteform" class="generator-form" novalidate aria-labelledby="formHelp">
-                        <div class="form-row">
-                            <label for="subject" class="form-label">Subject / Topic</label>
-                            <input type="text" name="subject" class="form-input" id="subject" placeholder="e.g., Thermodynamics: First Law" autocomplete="on">
+                    <form id="noteform" class="generator-form mx-auto"  novalidate aria-labelledby="formHelp">
+                        <!-- Subject / Topic -->
+                        <div class="mb-4">
+                            <label for="subject" class="form-label fw-semibold">Subject / Topic</label>
+                            <input type="text" name="subject" class="form-control shadow-sm" id="subject" placeholder="e.g., Thermodynamics: First Law" autocomplete="on">
                         </div>
 
-                        <div class="form-row">
-                            <label for="notes" class="form-label">Study Notes</label>
-                            <textarea name="notes" id="notes" class="form-input" rows="10" placeholder="Paste your study notes here..." required></textarea>
-                            <small class="form-help" id="formHelp">Tip: Clear, concise notes yield better questions.</small>
+                        <!-- Notes -->
+                        <div class="mb-4">
+                            <label for="notes" class="form-label fw-semibold">Study Notes</label>
+                            <textarea name="notes" id="notes" class="form-control shadow-sm" rows="10" placeholder="Paste your study notes here..." required></textarea>
+                            <small class="form-help" id="formHelp">💡Tip: Clear, concise notes yield better questions.</small>
                         </div>
 
-                        <div class="form-actions">
-                            <button class="btn btn-primary" id="btnGenerate" type="submit">
+                        <!-- Buttons -->
+                        <div class="d-flex flex-wrap gap-3 justify-content-center">
+                            <button class="btn btn-primary px-4" id="btnGenerate" type="submit">
                                 <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Generate 5 Questions
                             </button>
-                            <button class="btn btn-ghost" id="btnClear" type="button">
-                                <i class="fa-solid fa-eraser" aria-hidden="true"></i> Clear
+                            <button class="btn btn-outline-secondary px-4" id="btnClear" type="button">
+                                <i class="fa-solid fa-eraser me-2" aria-hidden="true"></i> Clear
                             </button>
                         </div>
                     </form>
 
                     <!-- Loading state -->
-                     <div class="loader" id="loader" aria-live="polite" aria-busy="false" hidden>
-                        <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
-                        <span class="loader-text">Generating flashcards...</span>
+                     <div class="loader text-center my-4" id="loader" aria-live="polite" aria-busy="false" hidden>
+                        <i class="fa-solid fa-circle-notch fa-spin fa-2x text-primary" aria-hidden="true"></i>
+                        <span class="loader-text d-block mt-2">Generating flashcards...</span>
                      </div>
 
                     <!-- Results -->
-                     <div class="results-grid" id="results" aria-live="polite" aria-label="Generated flashcards"></div>
+                     <div class="results-grid row g-4 justify-content-center" id="results" aria-live="polite" aria-label="Generated flashcards"></div>
 
                     <!-- Save actions -->
-                     <div class="save-bar" id="saveBar" hidden>
+                     <div class="save-bar d-flex justify-content-center gap-3 mt-4" id="saveBar" hidden>
                         <button id="btnSaveSet" class="btn btn-success">
-                            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save Set
+                            <i class="fa-solid fa-floppy-disk me-2" aria-hidden="true"></i> Save Set
                         </button>
-                        <button id="btnDownloadJSON" class="btn btn-outline">
-                            <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i> Download JSON
+                        <button id="btnDownloadJSON" class="btn btn-outline-primary">
+                            <i class="fa-solid fa-file-arrow-down me-2" aria-hidden="true"></i> Download JSON
                         </button>
                      </div>
                 </div>
              </section>
 
              <!-- Library section (saved cards) -->
-              <section class="library-section" id="library" aria-labelledby="libraryTitle">
+              <section class="library-section py-5" id="library" aria-labelledby="libraryTitle">
                 <div class="container">
-                    <h2 class="section-title" id="libraryTitle">Your Library</h2>
+                    <h2 class="section-title mb-4 text-center" id="libraryTitle">Your Library</h2>
 
-                    <div class="library-controls">
-                        <div class="search-wrap">
-                            <label for="search" class="sr-only">Search flashcards</label>
-                            <input type="search" class="form-input" id="search" placeholder="Search by subject or keyword...">
+                    <!-- Controls -->
+                    <div class="library-controls row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="search-wrap">
+                                <label for="search" class="sr-only">Search flashcards</label>
+                                <input type="search" class="form-input" id="search" placeholder="Search by subject or keyword...">
+                            </div>
                         </div>
-                        <div class="sort-wrap">
-                            <label for="sort" class="sr-only">Sort by</label>
-                            <select id="sort" class="form-input">
-                                <option value="recent">Most Recent</option>
-                                <option value="subject">Subject (A-Z)</option>
-                            </select>
+                        <div class="col-md-6">
+                                <div class="sort-wrap">
+                                <label for="sort" class="sr-only">Sort by</label>
+                                <select id="sort" class="form-input">
+                                    <option value="recent">Most Recent</option>
+                                    <option value="subject">Subject (A-Z)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="library-grid" id="libraryGrid" aria-live="polite"></div>
+                    <!-- Grid -->
+                    <div class="library-grid row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="libraryGrid" aria-live="polite"></div>
                 </div>
               </section>
 
               <!-- Contact / Footer CTA section -->
-               <section class="contact-cta-section" id="contact" aria-labelledby="contactTitle">
-                <div class="container contact-cta">
-                    <div>
-                        <h2 class="section-title" id="contactTitle">Have feedback or ideas?</h2>
-                        <p class="section-subtitle">We're building this for learners and educators. Share features you'd love to see!</p>
+               <section class="contact-cta-section py-5 bg-light"  id="contact" aria-labelledby="contactTitle">
+                <div class="container text-center">
+                    <div class="mb-4">
+                        <h2 class="section-title h3 fw-bold" id="contactTitle">Have feedback or ideas?</h2>
+                        <p class="section-subtitle text-muted">We're building this for learners and educators. Share features you'd love to see!</p>
                     </div>
-                    <div class="cta-actions">
-                        <a href="mailto:gideonudeh8@gmail.com" class="btn btn-primary">
-                            <i class="fa-solid fa-envelope"></i> Email Us
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                        <a href="mailto:gideonudeh8@gmail.com" class="btn btn-primary px-4">
+                            <i class="fa-solid fa-envelope me-2"></i> Email Us
                         </a>
                         <a href="https://github.com/udeh-gideon/ai-study-buddy-hackathon" target="_blank" rel="noopener" class="btn btn-ghost">
-                            <i class="fa-brands fa-github"></i> Star on GitHub
+                            <i class="fa-brands fa-github me-2"></i> Star on GitHub
                         </a>
                     </div>
                 </div>
@@ -287,16 +301,27 @@
          </dialog>
 
         <!-- Footer section -->
-         <footer class="site-footer" role="contentinfo">
-            <div class="container footer-grid">
-                <p>
-                    <strong>AI Study Buddy</strong> - Building better learners with active recall.
-                </p>
-                <ul class="socials">
-                    <li><a href="https://github.com/udeh-gideon/ai-study-buddy-hackathon" aria-label="GitHub"><i class="fa-brands fa-github"></i></a></li>
-                    <li><a href="https://linkedin.com/in/gideon-udeh" aria-label="Linkedin"><i class="fa-brands fa-linkedin"></i></a></li>
-                    <li><a href="mailto:gideonudeh8@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a></li>
-                </ul>
+         <footer class="site-footer py-4" role="contentinfo">
+            <div class="container">
+                <div class="row align-items-center justify-content-between text-center text-md-start">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <p class="mb-0">
+                            <strong>AI Study Buddy</strong> - Building better learners with active recall.
+                            <br>
+                            &copy; 2025 | Gideon Udeh.
+                        </p>
+                    </div>
+
+                    <!-- Social link list -->
+                    <div class="col-md-6">
+                        <ul class="socials list-inline mb-0 text-center text-md-end">
+                            <li class="list-inline-item"><a href="https://github.com/udeh-gideon/ai-study-buddy-hackathon" aria-label="GitHub"><i class="fa-brands fa-github"></i></a></li>
+                            <li class="list-inline-item"><a href="https://linkedin.com/in/gideon-udeh" aria-label="Linkedin"><i class="fa-brands fa-linkedin"></i></a></li>
+                            <li class="list-inline-item"><a href="mailto:gideonudeh8@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>    
             </div>
          </footer>
 
@@ -309,6 +334,11 @@
                 if (window.AOS) AOS.init({ duration: 900, easing: 'ease-out-quart', once: true});
             });
          </script>
+         <!-- Bootstrap JavaScript Bundle (includes Popper) -->
+        <script 
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+        crossorigin="anonymous"></script>
         <!-- My App JS File -->
          <script src="script.js" defer></script>
      </body>
