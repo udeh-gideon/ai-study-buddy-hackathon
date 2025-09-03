@@ -357,6 +357,17 @@
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
         crossorigin="anonymous"></script>
+         <!-- SupaBase Script -->
+          <!-- Supabase JS (UMD build for non-module scripts) -->
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.2/dist/umd/supabase.min.js"></script>
+
+        <script>
+        // TODO: paste your values
+        window.SUPABASE_URL = "https://erewtavdazxcdnhpmqgp.supabase.co";
+        window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyZXd0YXZkYXp4Y2RuaHBtcWdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5MzQ1MzQsImV4cCI6MjA3MjUxMDUzNH0.Q9iKGRJt0dIyCW6a6-IFPlvHtpXVx1lRJc51aXneRrc";
+        window.db = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+        </script>
+
         <!-- My App JS File -->
          <script src="script.js" defer></script>
      </body>

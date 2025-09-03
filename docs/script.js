@@ -5,222 +5,295 @@ document.querySelectorAll('.flashcard').forEach(card => {
   });
 });
 
-// Utility: get flashcards from localStorage
-function getFlashcards() {
-  return JSON.parse(localStorage.getItem("flashcards")) || [];
-}
+// Generator Logic
+// Elements
+const saveBar = document.getElementById("saveBar");
+const btnSaveSet = document.getElementById("btnSaveSet");
+const resultsGrid = document.getElementById("results");
 
-// Utility: save flashcards to localStorage
-function saveFlashcards(cards) {
-  localStorage.setItem("flashcards", JSON.stringify(cards));
-}
+// Save all generated flashcards to Supabase
+btnSaveSet.addEventListener("click", async () => {
+  const subject = document.getElementById("subject").value.trim() || "General";
+  
+  // Collect generated flashcards from results grid
+  const flashcards = Array.from(resultsGrid.querySelectorAll(".flashcard")).map(card => {
+    return {
+      subject,
+      question: card.querySelector(".card-question").innerText.trim(),
+      answer: card.querySelector(".card-answer").innerText.trim(),
+    };
+  });
 
-// Example function: add a flashcard
-function addFlashcard(question, answer) {
-  const flashcards = getFlashcards();
+  if (flashcards.length === 0) {
+    showToast("No flashcards to save!", "warning");
+    return;
+  }
 
-  // Create flashcard object
-  const newCard = {
-    id: Date.now().toString(), // unique ID
-    question: question,
-    answer: answer
-  };
+  try {
+    const { data, error } = await supabase.from("flashcards").insert(flashcards);
 
-  flashcards.push(newCard);
-  saveFlashcards(flashcards);
-  console.log("Flashcard saved:", newCard);
-}
+    if (error) throw error;
 
-// Demo: Save a sample flashcard on button click
-document.getElementById("btnSaveSet")?.addEventListener("click", () => {
-  addFlashcard(
-    "What is Active Recall?",
-    "A study technique that boosts retention by retrieving information from memory."
-  );
-  alert("Flashcard saved to localStorage!");
+    // Success!
+    showToast(`${flashcards.length} flashcards saved!`, "success");
+
+    // Refresh library to show new cards instantly
+    loadFlashcards(true);
+
+    // Hide save bar after saving
+    saveBar.hidden = true;
+  } catch (err) {
+    console.error("Error saving flashcards:", err.message);
+    showToast("Error saving flashcards. Try again.", "danger");
+  }
 });
 
-// Debug: view saved flashcards in console
-function showFlashcards() {
-  const flashcards = getFlashcards();
-  console.log("📚 Your saved flashcards:", flashcards);
-}
+// Download generated flashcards as JSON
+document.getElementById("btnDownloadJSON").addEventListener("click", () => {
+  const resultsGrid = document.getElementById("results");
+  const cards = resultsGrid.querySelectorAll(".flashcard");
 
-// Retrieve flashcards from localStorage
-function loadFlashcards() {
-  let flashcards = JSON.parse(localStorage.getItem("flashcards")) || [];
+  if (cards.length === 0) {
+    alert("⚠ No flashcards to download.");
+    return;
+  }
 
-  const library = document.getElementById("flashcard-library");
-  library.innerHTML = ""; // Clear previous entries before rendering
-
-  flashcards.forEach(card => {
-    // Create the flashcard element
-    const flashcard = document.createElement("div");
-    flashcard.classList.add("flashcard");
-
-    flashcard.innerHTML = `
-      <div class="flashcard-face front">
-        <div class="flashcard-content">
-          <span>${card.question}</span>
-          <br><br>
-          <small class="hint">Answer is on the flip side ↩</small>
-        </div>
-      </div>
-      <div class="flashcard-face back">
-        <span>${card.answer}</span>
-      </div>
-    `;
-
-    // Add click-to-flip functionality
-    flashcard.addEventListener("click", () => {
-      flashcard.classList.toggle("flipped");
-    });
-
-    library.appendChild(flashcard);
-  });
-}
-
-// Run this once when the page loads
-document.addEventListener("DOMContentLoaded", loadFlashcards);
-
-function renderFlashcards(limit = 5) {
-  const libraryGrid = document.getElementById("libraryGrid");
-  const flashcards = JSON.parse(localStorage.getItem("flashcards")) || [];
-
-  libraryGrid.innerHTML = ""; // clear grid
-
-  const flashcardsToShow = limit ? flashcards.slice(0, limit) : flashcards;
-
-  flashcardsToShow.forEach((card, index) => {
-    const cardDiv = document.createElement("div");
-    cardDiv.className = "col flashcard-fade"; // apply fade class
-    cardDiv.innerHTML = `
-      <div class="card shadow-sm h-100">
-        <div class="card-body">
-          <h5 class="card-title">${card.question}</h5>
-          <p class="card-text">${card.answer}</p>
-        </div>
-      </div>
-    `;
-    libraryGrid.appendChild(cardDiv);
-
-    // Staggered fade-in (delay by index)
-    setTimeout(() => {
-      cardDiv.classList.add("show");
-    }, index * 100); // 100ms delay between each card
+  // Collect data
+  const flashcards = Array.from(cards).map(card => {
+    const question = card.querySelector(".card-question")?.innerText || "";
+    const answer = card.querySelector(".card-answer")?.innerText || "";
+    return { question, answer };
   });
 
-  // Update button text
-  const toggleBtn = document.getElementById("toggleFlashcards");
+  // Convert to JSON
+  const blob = new Blob([JSON.stringify(flashcards, null, 2)], {
+    type: "application/json",
+  });
+
+  // Create download link
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "flashcards.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+
+// For Flashcard Library
+/* ========= Supabase Flashcards ========= */
+const PAGE_SIZE = 5;
+let page = 0;
+let currentSearch = '';
+let currentSort = 'recent';
+
+function escapeHtml(str = '') {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+async function saveFlashcard({ subject = '', question, answer }) {
+  const { data, error } = await db
+    .from('flashcards')
+    .insert([{ subject, question, answer }])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function fetchFlashcards({ page = 0, pageSize = PAGE_SIZE, search = '', sort = 'recent' } = {}) {
+  let query = db.from('flashcards').select('*', { count: 'exact' });
+
+  if (search) {
+    query = query.or(`subject.ilike.%${search}%,question.ilike.%${search}%,answer.ilike.%${search}%`);
+  }
+
+  if (sort === 'subject') {
+    query = query.order('subject', { ascending: true }).order('created_at', { ascending: false });
+  } else {
+    query = query.order('created_at', { ascending: false });
+  }
+
+  const from = page * pageSize;
+  const to = from + pageSize - 1;
+  const { data, error, count } = await query.range(from, to);
+  if (error) throw error;
+  return { rows: data || [], total: count ?? 0 };
+}
+
+async function deleteFlashcard(id) {
+  const { error } = await db.from('flashcards').delete().eq('id', id);
+  if (error) throw error;
+}
+
+async function updateFlashcard(id, fields) {
+  const { error } = await db.from('flashcards').update(fields).eq('id', id);
+  if (error) throw error;
+}
+
+/* ========= UI Rendering ========= */
+const grid = document.getElementById('libraryGrid');
+const searchInput = document.getElementById('search');
+const sortSelect = document.getElementById('sort');
+const toggleBtn = document.getElementById('toggleFlashcards');
+
+function cardTemplate(row) {
+  const subj = escapeHtml(row.subject || 'Flashcard');
+  const q = escapeHtml(row.question);
+  const a = escapeHtml(row.answer);
+  const id = row.id;
+
+  return `
+  <div class="col">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-2">${subj}</h5>
+        <p class="card-text mb-1"><strong>Q:</strong> ${q}</p>
+        <p class="card-text text-muted"><strong>A:</strong> ${a}</p>
+      </div>
+      <div class="card-footer bg-white d-flex justify-content-end gap-2">
+        <button class="btn btn-sm btn-outline-secondary" data-edit="${id}" title="Edit"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-sm btn-outline-danger" data-delete="${id}" title="Delete"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function renderPage({ reset = false } = {}) {
+  if (reset) {
+    page = 0;
+    grid.innerHTML = '';
+  }
+
+  const { rows, total } = await fetchFlashcards({
+    page,
+    pageSize: PAGE_SIZE,
+    search: currentSearch,
+    sort: currentSort
+  });
+
+  grid.insertAdjacentHTML('beforeend', rows.map(cardTemplate).join(''));
+
+  // Show More / Less button
+  const shown = (page + 1) * PAGE_SIZE;
   if (toggleBtn) {
-    if (limit && flashcards.length > limit) {
-      toggleBtn.style.display = "inline-block";
-      toggleBtn.textContent = "Show More";
-    } else if (!limit) {
-      toggleBtn.style.display = "inline-block";
-      toggleBtn.textContent = "Show Less";
+    if (shown < total) {
+      toggleBtn.textContent = 'Show More';
+      toggleBtn.disabled = false;
+      toggleBtn.dataset.mode = 'more';
+    } else if (total > PAGE_SIZE) {
+      toggleBtn.textContent = 'Show Less';
+      toggleBtn.disabled = false;
+      toggleBtn.dataset.mode = 'less';
     } else {
-      toggleBtn.style.display = "none"; // hide if ≤5 flashcards
+      toggleBtn.disabled = true;
+      toggleBtn.textContent = 'Show More';
     }
   }
 }
 
-// Integrating a delete button on flashcards rendered
-function renderFlashcard(card) {
-  const colDiv = document.createElement('div');
-  colDiv.className = 'col';
-  colDiv.innerHTML = `
-    <div class="card h-100 shadow-sm">
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">${card.question}</h5>
-        <p class="card-text flex-grow-1">${card.answer}</p>
-        <div class="d-flex justify-content-end gap-2 mt-2">
-          <button class="btn btn-sm btn-outline-primary btn-edit" data-id="${card.id}">
-            <i class="fa-solid fa-pen-to-square"></i>
-          </button>
-          <button class="btn btn-sm btn-outline-danger btn-delete" data-id="${card.id}">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-  return colDiv;
-}
-
-// Logic behind the delete feature
-function displayFlashcards() {
-  const libraryGrid = document.getElementById('libraryGrid');
-  libraryGrid.innerHTML = ""; // clear grid first
-
-  const flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
-
-  flashcards.forEach(card => {
-    const cardEl = renderFlashcard(card);
-    libraryGrid.appendChild(cardEl);
+/* ========= Controls ========= */
+if (toggleBtn) {
+  toggleBtn.addEventListener('click', async () => {
+    const mode = toggleBtn.dataset.mode || 'more';
+    if (mode === 'more') {
+      page += 1;
+      await renderPage();
+    } else {
+      await renderPage({ reset: true });
+    }
   });
 }
 
-// Event delegation for delete
-document.getElementById('libraryGrid').addEventListener('click', (e) => {
-  if (e.target.closest('.btn-delete')) {
-    const cardId = e.target.closest('.btn-delete').dataset.id;
-    deleteFlashcard(cardId);
+if (searchInput) {
+  searchInput.addEventListener('input', debounce(async (e) => {
+    currentSearch = e.target.value.trim();
+    await renderPage({ reset: true });
+  }, 300));
+}
+
+if (sortSelect) {
+  sortSelect.addEventListener('change', async (e) => {
+    currentSort = e.target.value;
+    await renderPage({ reset: true });
+  });
+}
+
+/* Delegated Edit/Delete */
+grid?.addEventListener('click', async (e) => {
+  const delBtn = e.target.closest('[data-delete]');
+  const editBtn = e.target.closest('[data-edit]');
+
+  try {
+    if (delBtn) {
+      const id = delBtn.getAttribute('data-delete');
+      if (confirm('Delete this flashcard?')) {
+        await deleteFlashcard(id);
+        showToast('Flashcard deleted');
+        await renderPage({ reset: true });
+      }
+    }
+    if (editBtn) {
+      const id = editBtn.getAttribute('data-edit');
+      const newQuestion = prompt('Update question:');
+      if (newQuestion === null) return;
+      const newAnswer = prompt('Update answer:');
+      if (newAnswer === null) return;
+      await updateFlashcard(id, { question: newQuestion, answer: newAnswer });
+      showToast('Flashcard updated');
+      await renderPage({ reset: true });
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Something went wrong', 'error');
   }
 });
 
-function deleteFlashcard(id) {
-  let flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
-  flashcards = flashcards.filter(card => card.id !== id);
-  localStorage.setItem('flashcards', JSON.stringify(flashcards));
-  displayFlashcards(); // refresh the grid
-  showToast("Flashcard deleted successfully!");
-}
-
-// Toast feedback
-function showToast(message) {
+/* Toast */
+function showToast(message, type = 'success') {
   const toast = document.getElementById('toast');
-  const msg = toast.querySelector('.toast-msg');
-  msg.textContent = message;
-
+  if (!toast) return;
+  toast.querySelector('.toast-msg').textContent = message;
   toast.hidden = false;
-  setTimeout(() => {
-    toast.hidden = true;
-  }, 2500);
+  toast.classList.remove('toast--error', 'toast--success');
+  toast.classList.add(type === 'error' ? 'toast--error' : 'toast--success');
+  setTimeout(() => { toast.hidden = true; }, 2000);
 }
 
-// Initial render on load
-document.addEventListener('DOMContentLoaded', displayFlashcards);
-
-document.getElementById('libraryGrid').addEventListener('click', (e) => {
-  // Delete
-  if (e.target.closest('.btn-delete')) {
-    const cardId = e.target.closest('.btn-delete').dataset.id;
-    deleteFlashcard(cardId);
+/* Realtime (✨ hackathon wow factor) */
+function initRealtime() {
+  try {
+    db
+      .channel('realtime:flashcards')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'flashcards' }, async () => {
+        await renderPage({ reset: true });
+      })
+      .subscribe();
+  } catch (e) {
+    console.warn('Realtime not enabled. Enable in Database → Replication → Publications.');
   }
+}
 
-  // Edit Flashcard
-  if (e.target.closest('.btn-edit')) {
-    const cardId = e.target.closest('.btn-edit').dataset.id;
-    editFlashcard(cardId);
-  }
+/* Debounce helper */
+function debounce(fn, ms = 300) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), ms);
+  };
+}
+
+/* Init */
+document.addEventListener('DOMContentLoaded', async () => {
+  await renderPage({ reset: true });
+  initRealtime();
 });
 
-function editFlashcard(id) {
-  let flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
-  const card = flashcards.find(c => c.id === id);
-  if (!card) return;
 
-  // Simple prompt version (later we can do a modal form)
-  const newQuestion = prompt("Edit Question:", card.question);
-  const newAnswer = prompt("Edit Answer:", card.answer);
-
-  if (newQuestion && newAnswer) {
-    card.question = newQuestion;
-    card.answer = newAnswer;
-
-    localStorage.setItem('flashcards', JSON.stringify(flashcards));
-    displayFlashcards();
-    showToast("Flashcard updated successfully!");
-  }
-}
