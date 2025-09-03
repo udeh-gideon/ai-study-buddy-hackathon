@@ -187,28 +187,10 @@ section {
 
 /* Flashcard styling */
 .flashcard {
+  position: relative;
   width: 280px;
   height: 180px;
-  /* position: relative;
-  transform-style: preserve-3d;
-  box-shadow: var(--shadow-lg);
-  border-radius: 10px;
-  overflow: hidden; */
-  cursor: pointer;
-}
-
-.flashcard-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.8s ease-in-out;
-  border-radius: 10px;
-  box-shadow: var(--shadow-lg);
-}
-
-.flashcard.flipped .flashcard-inner {
-  transform: rotateY(180deg);
+  perspective: 1000px; /* 3D depth */
 }
 
 .flashcard-face {
@@ -216,16 +198,29 @@ section {
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column; /* allow stacking question + hint */
   align-items: center;
+  justify-content: center;
   padding: 1rem;
-  font-size: 1rem;
-  font-weight: 500;
-  font-family: var(--body-font);
-  background: var(--light);
-  color: var(--dark);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
   backface-visibility: hidden;
+  transform-style: preserve-3d;
   transition: transform 0.8s ease-in-out;
+  text-align: center;
+}
+
+.flashcard-face span {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.flashcard-face .hint {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  opacity: 0.8;
+  font-style: italic;
 }
 
 .flashcard-face.front {
@@ -234,26 +229,25 @@ section {
 }
 
 .flashcard-face.back {
-  transform: rotateY(180deg);
   background: var(--info);
   color: var(--light);
+  transform: rotateY(180deg); /* face away initially */
 }
 
-/* Flip on hover (desktop only) */
+/* Hover flip (desktop only) */
 @media (hover: hover) and (pointer: fine) {
   .flashcard:hover .front {
     transform: rotateY(180deg);
   }
-
   .flashcard:hover .back {
     transform: rotateY(360deg);
   }
 }
 
+/* Click/tap flip */
 .flashcard.flipped .front {
   transform: rotateY(180deg);
 }
-
 .flashcard.flipped .back {
   transform: rotateY(360deg);
 }
