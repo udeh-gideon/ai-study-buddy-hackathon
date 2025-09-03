@@ -220,20 +220,24 @@
              <!-- Library section (saved cards) -->
               <section class="library-section py-5" id="library" aria-labelledby="libraryTitle">
                 <div class="container">
-                    <h2 class="section-title mb-4 text-center" id="libraryTitle">Your Library</h2>
+                    <h2 class="section-title mb-4 text-center" id="libraryTitle">Your Flashcard Library</h2>
 
                     <!-- Controls -->
-                    <div class="library-controls row g-3 mb-4">
-                        <div class="col-md-6">
-                            <div class="search-wrap">
-                                <label for="search" class="sr-only">Search flashcards</label>
-                                <input type="search" class="form-input" id="search" placeholder="Search by subject or keyword...">
+                    <div class="library-controls row g-3 mb-4 align-items-center text-center">
+
+                        <!-- Search -->
+                        <div class="col-12 col-md-6 d-flex justify-content-center">
+                            <div class="search-wrap w-75 w-md-100 d-flex">
+                                <label for="search" class="visually-hidden">Search flashcards</label>
+                                <input type="search" class="form-control" id="search" placeholder="Search by subject or keyword...">
                             </div>
                         </div>
-                        <div class="col-md-6">
-                                <div class="sort-wrap">
-                                <label for="sort" class="sr-only">Sort by</label>
-                                <select id="sort" class="form-input">
+
+                        <!-- Sort -->
+                        <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end">
+                                <div class="sort-wrap w-75 w-md-auto d-flex">
+                                <label for="sort" class="visually-hidden">Sort by</label>
+                                <select id="sort" class="form-select">
                                     <option value="recent">Most Recent</option>
                                     <option value="subject">Subject (A-Z)</option>
                                 </select>
@@ -244,7 +248,13 @@
                     <!-- Grid -->
                     <div class="library-grid row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="libraryGrid" aria-live="polite"></div>
                 </div>
-              </section>
+                <!-- Display saved flash card grid -->
+                 <div id="flashcard-library" class="d-flex flex-wrap justify-content-center gap-3"></div>
+                <!-- Show More / Less Button -->
+                 <div class="text-center mt-3">
+                    <button class="btn btn-primary" id="toggleFlashcards">Show More</button>
+                 </div>
+              </section> 
 
               <!-- Contact / Footer CTA section -->
                <section class="contact-cta-section py-5 bg-light"  id="contact" aria-labelledby="contactTitle">

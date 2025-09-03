@@ -252,6 +252,23 @@ section {
   transform: rotateY(360deg);
 }
 
+/* Fade-in animation for flashcards */
+.flashcard-fade {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.flashcard-fade.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Flash cards grid */
+#flashcard-library {
+  padding: 1rem;
+}
+
 /* Features Section */
 .features-section {
   background-color: #f9fafc; /* light neutral background */
@@ -471,13 +488,6 @@ section {
   font-family: var(--heading-font);
   font-weight: 600;
   color: var(--secondary);
-}
-
-.library-controls {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--gap);
 }
 
 .search-wrap input,
