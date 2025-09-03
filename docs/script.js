@@ -1,6 +1,15 @@
-// Interactive flashcard for both desktop and mobile users
-document.querySelectorAll('.flashcard').forEach(card => {
-  card.addEventListener('click', 'touchend', () => {
-    card.classList.toggle('flipped');
+// Interactive Flashcard
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.flashcard').forEach(card => {
+    // Toggle on click (desktop users)
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+    });
+
+    // Toggle on touch (mobile users)
+    card.addEventListener('touchend', () => {
+      card.classList.toggle('flipped');
+    });
   });
 });
