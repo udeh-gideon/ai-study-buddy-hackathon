@@ -125,3 +125,102 @@ function renderFlashcards(limit = 5) {
   }
 }
 
+// Integrating a delete button on flashcards rendered
+function renderFlashcard(card) {
+  const colDiv = document.createElement('div');
+  colDiv.className = 'col';
+  colDiv.innerHTML = `
+    <div class="card h-100 shadow-sm">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">${card.question}</h5>
+        <p class="card-text flex-grow-1">${card.answer}</p>
+        <div class="d-flex justify-content-end gap-2 mt-2">
+          <button class="btn btn-sm btn-outline-primary btn-edit" data-id="${card.id}">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-danger btn-delete" data-id="${card.id}">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  return colDiv;
+}
+
+// Logic behind the delete feature
+function displayFlashcards() {
+  const libraryGrid = document.getElementById('libraryGrid');
+  libraryGrid.innerHTML = ""; // clear grid first
+
+  const flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
+
+  flashcards.forEach(card => {
+    const cardEl = renderFlashcard(card);
+    libraryGrid.appendChild(cardEl);
+  });
+}
+
+// Event delegation for delete
+document.getElementById('libraryGrid').addEventListener('click', (e) => {
+  if (e.target.closest('.btn-delete')) {
+    const cardId = e.target.closest('.btn-delete').dataset.id;
+    deleteFlashcard(cardId);
+  }
+});
+
+function deleteFlashcard(id) {
+  let flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
+  flashcards = flashcards.filter(card => card.id !== id);
+  localStorage.setItem('flashcards', JSON.stringify(flashcards));
+  displayFlashcards(); // refresh the grid
+  showToast("Flashcard deleted successfully!");
+}
+
+// Toast feedback
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  const msg = toast.querySelector('.toast-msg');
+  msg.textContent = message;
+
+  toast.hidden = false;
+  setTimeout(() => {
+    toast.hidden = true;
+  }, 2500);
+}
+
+// Initial render on load
+document.addEventListener('DOMContentLoaded', displayFlashcards);
+
+document.getElementById('libraryGrid').addEventListener('click', (e) => {
+  // Delete
+  if (e.target.closest('.btn-delete')) {
+    const cardId = e.target.closest('.btn-delete').dataset.id;
+    deleteFlashcard(cardId);
+  }
+
+  // Edit Flashcard
+  if (e.target.closest('.btn-edit')) {
+    const cardId = e.target.closest('.btn-edit').dataset.id;
+    editFlashcard(cardId);
+  }
+});
+
+function editFlashcard(id) {
+  let flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
+  const card = flashcards.find(c => c.id === id);
+  if (!card) return;
+
+  // Simple prompt version (later we can do a modal form)
+  const newQuestion = prompt("Edit Question:", card.question);
+  const newAnswer = prompt("Edit Answer:", card.answer);
+
+  if (newQuestion && newAnswer) {
+    card.question = newQuestion;
+    card.answer = newAnswer;
+
+    localStorage.setItem('flashcards', JSON.stringify(flashcards));
+    displayFlashcards();
+    showToast("Flashcard updated successfully!");
+  }
+}
