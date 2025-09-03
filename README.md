@@ -106,6 +106,7 @@ By combining accessibility with AI, the tool bridges the gap for learners in und
 
 ![CTA-Footer Mobile View](./assets/ai-study-buddy-mobile-cta-footer-design.jpg)
 *This is the display of the CTA-Footer Section on Mobile view*
+
 ---
 
 ## 🚀 Getting Started
