@@ -76,8 +76,36 @@ By combining accessibility with AI, the tool bridges the gap for learners in und
 ---
 
 ## 📸 Screenshots
-[To be included soon...]
 
+![Main Interface](./assets/ai-study-buddy-desktop-hero-design.png)
+*This is the display of the Hero Section on Desktop view*
+
+![Features Interface](./assets/ai-study-buddy-desktop-features-design.png)
+*This is the display of the Features Section on Desktop view*
+
+![Generator Interface](./assets/ai-study-buddy-desktop-generator-design.png)
+*This is the display of the Generator Section on Desktop view*
+
+![Flashcard Library Interface](./assets/ai-study-buddy-desktop-flashcard-library-design.png)
+*This is the display of the Flashcard Library Section on Desktop view*
+
+![CTA-Footer Interface](./assets/ai-study-buddy-desktop-cta-footer-design.png)
+*This is the display of the CTA-Footer Section on Desktop view*
+
+![Hero Mobile View](./assets/ai-study-buddy-mobile-hero-design.jpg)
+*This is the display of the Hero Section on Mobile view*
+
+![Features Mobile View](./assets/ai-study-buddy-mobile-features-design.jpg)
+*This is the display of the Features Section on Mobile view*
+
+![Generator Mobile View](./assets/ai-study-buddy-mobile-generator-design.jpg)
+*This is the display of the Generator Section on Mobile view*
+
+![Flashcard Library Mobile View](./assets/ai-study-buddy-mobile-flashcard-library-design.jpg)
+*This is the display of the Flashcard Library Section on Mobile view*
+
+![CTA-Footer Mobile View](./assets/ai-study-buddy-mobile-cta-footer-design.jpg)
+*This is the display of the CTA-Footer Section on Mobile view*
 ---
 
 ## 🚀 Getting Started
