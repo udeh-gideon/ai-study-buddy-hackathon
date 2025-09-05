@@ -5,81 +5,231 @@ document.querySelectorAll('.flashcard').forEach(card => {
   });
 });
 
-// Generator Logic
-// Elements
-const saveBar = document.getElementById("saveBar");
-const btnSaveSet = document.getElementById("btnSaveSet");
+// ==========================
+// Flashcard Generator Section
+// ==========================
+
+// Authorization Header
+const SUPABASE_URL = "https://erewtavdazxcdnhpmqgp.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyZXd0YXZkYXp4Y2RuaHBtcWdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5MzQ1MzQsImV4cCI6MjA3MjUxMDUzNH0.Q9iKGRJt0dIyCW6a6-IFPlvHtpXVx1lRJc51aXneRrc"; // From project settings
+
+// Generator variable declaration
+const noteForm = document.getElementById("noteform");
+const subjectInput = document.getElementById("subject");
+const notesInput = document.getElementById("notes");
 const resultsGrid = document.getElementById("results");
+const saveBar = document.getElementById("saveBar");
+const loader = document.getElementById("loader");
 
-// Save all generated flashcards to Supabase
-btnSaveSet.addEventListener("click", async () => {
-  const subject = document.getElementById("subject").value.trim() || "General";
-  
-  // Collect generated flashcards from results grid
-  const flashcards = Array.from(resultsGrid.querySelectorAll(".flashcard")).map(card => {
-    return {
-      subject,
-      question: card.querySelector(".card-question").innerText.trim(),
-      answer: card.querySelector(".card-answer").innerText.trim(),
-    };
+// Supabase Function URL
+const SUPABASE_FUNCTION_URL = "https://erewtavdazxcdnhpmqgp.supabase.co/functions/v1/flashcards-ai";
+
+// Store the current generated flashcards temporarily
+let generatedFlashcards = [];
+
+// Handle Generate Button
+noteForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const subject = subjectInput.value.trim();
+  const notes = notesInput.value.trim();
+  if (!subject || !notes) {
+    alert("Please enter both subject and notes.");
+    return;
+  }
+
+  // Show loader
+  loader.hidden = false;
+  loader.setAttribute("aria-busy", "true");
+  resultsGrid.innerHTML = "";
+
+  try {
+    // Call Supabase Function → which calls Hugging Face securely
+    const response = await fetch(SUPABASE_FUNCTION_URL, {
+      method: "POST",
+      headers: { 
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json"},
+      body: JSON.stringify({ subject, notes }),
+    });
+
+    if (!response.ok) throw new Error("Failed to generate flashcards");
+    const data = await response.json();
+
+    // Hugging Face usually returns array of outputs → parse text
+    const outputText = Array.isArray(data)
+      ? data[0]?.generated_text || ""
+      : data.generated_text || JSON.stringify(data);
+
+    // Simple parsing: split into lines/questions
+    const pairs = outputText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.includes("?"))
+      .map((line) => {
+        const [q, a] = line.split("?"); // crude Q/A split
+        return {
+          question: q.trim() + "?",
+          answer: a ? a.trim() : "Answer not provided",
+          subject,
+        };
+      });
+
+    generatedFlashcards = pairs;
+
+    renderGeneratedFlashcards(pairs);
+    saveBar.hidden = false; // show Save/Download options
+  } catch (err) {
+    console.error(err);
+    alert("Error generating flashcards. Please try again.");
+  } finally {
+    loader.hidden = true;
+    loader.setAttribute("aria-busy", "false");
+  }
+});
+
+// Render Generated Flashcards
+function renderGeneratedFlashcards(cards) {
+  resultsGrid.innerHTML = "";
+  cards.forEach((card, idx) => {
+    const col = document.createElement("div");
+    col.className = "col-md-4";
+    col.innerHTML = `
+      <div class="flashcard generated-card" tabindex="0">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">
+            <h6 class="subject">${card.subject}</h6>
+            <p class="question">${card.question}</p>
+          </div>
+          <div class="flashcard-back">
+            <p class="answer">${card.answer}</p>
+          </div>
+        </div>
+      </div>
+    `;
+    resultsGrid.appendChild(col);
   });
+}
 
-  if (flashcards.length === 0) {
-    showToast("No flashcards to save!", "warning");
+// ==========================
+// Save Generated Set to Supabase
+// ==========================
+const btnSaveSet = document.getElementById("btnSaveSet");
+btnSaveSet.addEventListener("click", async () => {
+  if (!generatedFlashcards.length) {
+    alert("No flashcards to save.");
     return;
   }
 
   try {
-    const { data, error } = await supabase.from("flashcards").insert(flashcards);
-
-    if (error) throw error;
-
-    // Success!
-    showToast(`${flashcards.length} flashcards saved!`, "success");
-
-    // Refresh library to show new cards instantly
-    loadFlashcards(true);
-
-    // Hide save bar after saving
+    for (const card of generatedFlashcards) {
+      await supabase.from("flashcards").insert([card]);
+    }
+    alert("Flashcard set saved successfully ✅");
+    generatedFlashcards = [];
     saveBar.hidden = true;
   } catch (err) {
-    console.error("Error saving flashcards:", err.message);
-    showToast("Error saving flashcards. Try again.", "danger");
+    console.error(err);
+    alert("Error saving flashcards ❌");
   }
 });
 
-// Download generated flashcards as JSON
-document.getElementById("btnDownloadJSON").addEventListener("click", () => {
-  const resultsGrid = document.getElementById("results");
-  const cards = resultsGrid.querySelectorAll(".flashcard");
-
-  if (cards.length === 0) {
-    alert("⚠ No flashcards to download.");
+// ==========================
+// Download JSON
+// ==========================
+const btnDownloadJSON = document.getElementById("btnDownloadJSON");
+btnDownloadJSON.addEventListener("click", () => {
+  if (!generatedFlashcards.length) {
+    alert("No flashcards to download.");
     return;
   }
-
-  // Collect data
-  const flashcards = Array.from(cards).map(card => {
-    const question = card.querySelector(".card-question")?.innerText || "";
-    const answer = card.querySelector(".card-answer")?.innerText || "";
-    return { question, answer };
-  });
-
-  // Convert to JSON
-  const blob = new Blob([JSON.stringify(flashcards, null, 2)], {
+  const blob = new Blob([JSON.stringify(generatedFlashcards, null, 2)], {
     type: "application/json",
   });
-
-  // Create download link
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = "flashcards.json";
-  document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 });
+
+
+// Generator Logic
+// Elements
+// const saveBar = document.getElementById("saveBar");
+// const btnSaveSet = document.getElementById("btnSaveSet");
+// const resultsGrid = document.getElementById("results");
+
+// Save all generated flashcards to Supabase
+// btnSaveSet.addEventListener("click", async () => {
+//   const subject = document.getElementById("subject").value.trim() || "General";
+  
+  // Collect generated flashcards from results grid
+  // const flashcards = Array.from(resultsGrid.querySelectorAll(".flashcard")).map(card => {
+  //   return {
+  //     subject,
+  //     question: card.querySelector(".card-question").innerText.trim(),
+  //     answer: card.querySelector(".card-answer").innerText.trim(),
+  //   };
+  // });
+
+  // if (flashcards.length === 0) {
+  //   showToast("No flashcards to save!", "warning");
+  //   return;
+  // }
+
+  // try {
+  //   const { data, error } = await supabase.from("flashcards").insert(flashcards);
+
+  //   if (error) throw error;
+
+    // Success!
+    // showToast(`${flashcards.length} flashcards saved!`, "success");
+
+    // Refresh library to show new cards instantly
+    // loadFlashcards(true);
+
+    // Hide save bar after saving
+//     saveBar.hidden = true;
+//   } catch (err) {
+//     console.error("Error saving flashcards:", err.message);
+//     showToast("Error saving flashcards. Try again.", "danger");
+//   }
+// });
+
+// Download generated flashcards as JSON
+// document.getElementById("btnDownloadJSON").addEventListener("click", () => {
+//   const resultsGrid = document.getElementById("results");
+//   const cards = resultsGrid.querySelectorAll(".flashcard");
+
+//   if (cards.length === 0) {
+//     alert("⚠ No flashcards to download.");
+//     return;
+//   }
+
+  // Collect data
+  // const flashcards = Array.from(cards).map(card => {
+  //   const question = card.querySelector(".card-question")?.innerText || "";
+  //   const answer = card.querySelector(".card-answer")?.innerText || "";
+  //   return { question, answer };
+  // });
+
+  // Convert to JSON
+  // const blob = new Blob([JSON.stringify(flashcards, null, 2)], {
+  //   type: "application/json",
+  // });
+
+  // Create download link
+//   const url = URL.createObjectURL(blob);
+//   const a = document.createElement("a");
+//   a.href = url;
+//   a.download = "flashcards.json";
+//   document.body.appendChild(a);
+//   a.click();
+//   document.body.removeChild(a);
+//   URL.revokeObjectURL(url);
+// });
 
 
 // For Flashcard Library
