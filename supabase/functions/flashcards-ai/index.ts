@@ -29,32 +29,62 @@ serve(async (req) => {
       return jsonResponse({ error: "Notes are required" }, 400);
     }
 
-    const HF_API_KEY = Deno.env.get("HF_API_KEY"); // ✅ fixed key name
-    const HF_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn";
+    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+    const OR_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-    const response = await fetch(HF_URL, {
+    const response = await fetch(OR_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${HF_API_KEY}`,
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        inputs: `Generate 5 question-answer flashcards from these notes:\n\n${notes}`,
+        model: "mistralai/mistral-7b-instruct", // ✅ stable + free model
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a flashcard generator. Generate 5 concise question-answer flashcards from provided notes. Respond strictly in JSON format like this:\n\n[\n{\"question\": \"Q1\", \"answer\": \"A1\"},\n{\"question\": \"Q2\", \"answer\": \"A2\"},\n{\"question\": \"Q3\", \"answer\": \"A3\"},\n{\"question\": \"Q4\", \"answer\": \"A4\"},\n{\"question\": \"Q5\", \"answer\": \"A5\"}\n]",
+          },
+          {
+            role: "user",
+            content: `Notes:\n${notes}`,
+          },
+        ],
       }),
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("HF Error:", errText);
-      return jsonResponse({ error: "Hugging Face API failed", details: errText }, 500);
+      console.error("OpenRouter Error:", errText);
+      return jsonResponse(
+        { error: "OpenRouter API failed", details: errText },
+        500,
+      );
     }
 
     const data = await response.json();
 
-    return jsonResponse({ flashcards: data }, 200);
+    // Extract content
+    const flashcardsText = data.choices?.[0]?.message?.content || "[]";
 
+    let flashcards;
+    try {
+      flashcards = JSON.parse(flashcardsText);
+    } catch {
+      console.error("Parse Error: Model did not return valid JSON");
+      return jsonResponse(
+        { error: "Invalid JSON returned from model", raw: flashcardsText },
+        500,
+      );
+    }
+
+    return jsonResponse({ flashcards }, 200);
   } catch (err) {
     console.error("Server Error:", err);
-    return jsonResponse({ error: "Internal Server Error", details: err.message }, 500);
+    return jsonResponse(
+      { error: "Internal Server Error", details: err.message },
+      500,
+    );
   }
 });
